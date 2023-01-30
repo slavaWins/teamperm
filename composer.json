@@ -1,0 +1,28 @@
+{
+    "name": "slavawins/teamperm",
+    "description": "Expa",
+    "minimum-stability": "stable",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "slavaWins",
+            "email": "email@example.com",
+            "homepage": "https://github.com/slavaWins/teamperm"
+        }
+    ],
+    "require": {
+        "php": "^7.3|^8.0"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Teamperm\\Providers\\TeampermServiceProvider"
+            ]
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Teamperm\\": "src"
+        }
+    }
+}
