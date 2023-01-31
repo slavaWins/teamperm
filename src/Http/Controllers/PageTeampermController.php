@@ -4,8 +4,10 @@ namespace Teamperm\Http\Controllers;
 
 
 use App\Http\Controllers\Controller;
+use App\Library\Teamperm\TeampermPort;
 use App\Models\ResponseApi;
-use App\Models\Team;
+use Teamperm\Models\Team;
+use Teamperm\Models\TeamsUsers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -55,6 +57,75 @@ class PageTeampermController extends Controller
         return ResponseApi::Successful();
     }
 
+    public function InviteShow($inviteId)
+    {
+
+        /** @var User $user */
+        $user = Auth::user();
+
+
+        $invite = TeamsUsers::where("id", $inviteId)
+            ->where('user_id', $user->id)
+            ->where('is_invite', true)
+            ->first();
+        if (!$invite) abort(404);
+
+
+        $team = Team::find($invite->team_id);
+        if (!$team) abort(404);
+
+
+        return view("teamperm.page-invite", compact('team', 'invite'));
+    }
+
+    public function InviteDelete($invite)
+    {
+        /** @var User $user */
+        $user = Auth::user();
+
+
+        $inv = TeamsUsers::where("id", $invite)
+            ->where('user_id', $user->id)
+            ->where('is_invite', true)
+            ->first();
+        if (!$inv) abort(404);
+
+        $inv->delete();
+
+        return redirect()->route("home");
+    }
+
+    public function InviteActivate($invite)
+    {
+
+        /** @var User $user */
+        $user = Auth::user();
+
+
+        $inv = TeamsUsers::where("id", $invite)
+            ->where('user_id', $user->id)
+            ->where('is_invite', true)
+            ->first();
+        if (!$inv) abort(404);
+
+
+        $team = Team::find($inv->team_id);
+        if (!$team) abort(404);
+
+        $inv->is_invite = false;
+        $inv->save();
+
+
+        $owner = $team->owner();
+        if ($owner) {
+            $mess = "";
+            $mess .= $user->name . ' принял приглашение в команду ' . $team->name;
+            TeampermPort::SendNotification($owner, "Новый участник в команде", $mess);
+        }
+
+        return redirect()->route('team.setting', $inv->team_id);
+    }
+
     public function MemberAdd(Team $team, Request $request)
     {
         /** @var User $user */
@@ -63,7 +134,13 @@ class PageTeampermController extends Controller
         $uid = $request['uid'];
         $memberType = $request['memberType'];
 
-        $userTo = User::findOrFail($uid);
+        if (!isset(TeampermFinder::GetRoles()[$memberType])) return ResponseApi::Error("Ошибка роли");
+        if (empty($uid)) return ResponseApi::Error("Ошибка логина");
+
+        $uid = trim($uid, "_");
+        $userTo = User::where("login", $uid)->whereOr('email, $uid')->first();
+
+        if (!$userTo) return ResponseApi::Error("Пользователь не найден");
 
         if (!$user->CheckTeamPermission($team, 'canSendInvitations')) return ResponseApi::Error("Нет прав на приглашение участников");
 
@@ -71,8 +148,22 @@ class PageTeampermController extends Controller
             return ResponseApi::Error("Пользователь уже имеет приглашение");
         }
 
-        $team->users()->attach($userTo, ['memberType' => $memberType, 'is_invite' => true]);
+        $xz = $team->users()->attach($userTo, ['memberType' => $memberType, 'is_invite' => true]);
 
+        $invite = TeamsUsers::where("team_id", $team->id)->where("user_id", $userTo->id)->where('is_invite', true)->first();
+
+        if (!$invite) {
+            return ResponseApi::Error("Не удалось создать инвайт");
+        }
+
+        $invId = $invite->id;
+
+        $mess = "";
+        $mess .= "Здравствуйте! \n";
+        $mess .= $user->name . ' создал для вас приглашение в комнаду ' . $team->name;
+        $mess .= "\n Нажмите кнопку ниже что бы принять приглашение. ";
+        $link = route('team.member.inviteuse', $invId);
+        TeampermPort::SendNotification($userTo, "Приглашение в команду", $mess, "Перейти", $link);
 
         return ResponseApi::Successful("FSAFASF AS");
 

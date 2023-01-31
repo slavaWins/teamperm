@@ -27,14 +27,16 @@ class TeampermServiceProvider extends ServiceProvider
     public function boot()
     {
 
+        /*
         if ($this->app->runningInConsole()) {
             $this->commands([
                 ExampleCommand::class,
-                
+
             ]);
         }
+        */
 
-        $this->loadViewsFrom(__DIR__ . '/../resources/views', 'teamperm');
+       // $this->loadViewsFrom(__DIR__ . '/../resources/views', 'teamperm');
 
 
         $migrations_path = __DIR__ . '/../copy/migrations';
@@ -47,14 +49,36 @@ class TeampermServiceProvider extends ServiceProvider
         $migrations_path = __DIR__ . '/../copy/Controllers';
         if (file_exists($migrations_path)) {
             $this->publishes([
-                $migrations_path => app_path('Http/Controllers/Teamperm'),
+                $migrations_path => app_path('Http/Controllers'),
+            ], 'public');
+        }
+
+        $migrations_path = __DIR__ . '/../copy/config';
+        if (file_exists($migrations_path)) {
+            $this->publishes([
+                $migrations_path => app_path('config'),
+            ], 'public');
+        }
+
+        $migrations_path = __DIR__ . '/../copy/Contracts';
+        if (file_exists($migrations_path)) {
+            $this->publishes([
+                $migrations_path => app_path('Contracts'),
+            ], 'public');
+        }
+
+
+        $migrations_path = __DIR__ . '/../copy/Library';
+        if (file_exists($migrations_path)) {
+            $this->publishes([
+                $migrations_path => app_path('Library'),
             ], 'public');
         }
 
         $migrations_path = __DIR__ . '/../copy/views';
         if (file_exists($migrations_path)) {
             $this->publishes([
-                $migrations_path => resource_path('views/teamperm'),
+                $migrations_path => resource_path('views'),
             ], 'public');
         }
 
@@ -62,15 +86,11 @@ class TeampermServiceProvider extends ServiceProvider
         $js_path = __DIR__ . '/../copy/js';
         if (file_exists($js_path)) {
             $this->publishes([
-                $js_path => public_path('js/teamperm'),
+                $js_path => public_path('js'),
             ], 'public');
         }
 
-        /*
-        $this->publishes([
-            __DIR__ . '/../copy/Controllers/Teamperm' => app_path('Http/Controllers'),
-        ], 'public');
-*/
+
 
     }
 }

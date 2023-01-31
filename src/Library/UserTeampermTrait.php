@@ -4,7 +4,9 @@
 namespace Teamperm\Library;
 
 
-use App\Models\Team;
+use Teamperm\Models\Team;
+use Teamperm\Models\TeamsUsers;
+use App\Models\User;
 use Illuminate\Support\Facades\Route;
 
 
@@ -20,7 +22,7 @@ trait UserTeampermTrait
 
     public function teams()
     {
-        return $this->belongsToMany(Team::class, "teams_users", "user_id", "team_id")->withPivot("memberType");
+        return $this->belongsToMany(Team::class, "teams_users", "user_id", "team_id")->using(TeamsUsers::class)->withPivot(["memberType",'is_invite','id']);
     }
 
 

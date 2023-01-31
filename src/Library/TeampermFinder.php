@@ -5,7 +5,7 @@ namespace Teamperm\Library;
 
 
 use App\Contracts\Teamperm\TeamRoleStruct;
-use App\Models\Team;
+use Teamperm\Models\Team;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
