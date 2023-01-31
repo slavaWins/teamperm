@@ -137,12 +137,18 @@ class PageTeampermController extends Controller
         if (!isset(TeampermFinder::GetRoles()[$memberType])) return ResponseApi::Error("Ошибка роли");
         if (empty($uid)) return ResponseApi::Error("Ошибка логина");
 
-        $uid = trim($uid, "_");
-        $userTo = User::where("login", $uid)->whereOr('email, $uid')->first();
-
-        if (!$userTo) return ResponseApi::Error("Пользователь не найден");
 
         if (!$user->CheckTeamPermission($team, 'canSendInvitations')) return ResponseApi::Error("Нет прав на приглашение участников");
+
+        $tarifLimits = \App\Library\Teamperm\TeampermPort::GetUserLimits($team->owner());
+        if (count($team->users) >= $tarifLimits['teamMembers']) {
+            return ResponseApi::Error("Тариф владельца команды не позволяет добавить ещё одного участника.");
+        }
+
+        $uid = trim($uid, "_");
+        $userTo = User::where("login", $uid)->whereOr('email, $uid')->first();
+        if (!$userTo) return ResponseApi::Error("Пользователь не найден");
+
 
         if (TeampermFinder::GetMemberRole($team, $userTo)) {
             return ResponseApi::Error("Пользователь уже имеет приглашение");

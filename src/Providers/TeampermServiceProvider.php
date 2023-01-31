@@ -75,6 +75,14 @@ class TeampermServiceProvider extends ServiceProvider
             ], 'public');
         }
 
+
+        $migrations_path = __DIR__ . '/../copy/Polls';
+        if (file_exists($migrations_path)) {
+            $this->publishes([
+                $migrations_path => app_path('Polls'),
+            ], 'public');
+        }
+
         $migrations_path = __DIR__ . '/../copy/views';
         if (file_exists($migrations_path)) {
             $this->publishes([
