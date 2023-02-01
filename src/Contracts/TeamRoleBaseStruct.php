@@ -16,10 +16,14 @@ class TeamRoleBaseStruct
 
     /** @var bool может отправлять приглашения */
     public bool $canSendInvitations = false;
-
     public bool $canDeeleteMembers = false;
     public bool $canSetRoleMembers = false;
     public bool $canSetOwner = false;
+
+    public bool $edit = false;
+    public bool $view = false;
+    public bool $create = false;
+
 
 
     public function __construct($fill = [])

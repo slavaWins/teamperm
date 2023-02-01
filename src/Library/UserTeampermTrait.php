@@ -4,6 +4,7 @@
 namespace Teamperm\Library;
 
 
+use App\Models\Project;
 use Teamperm\Models\Team;
 use Teamperm\Models\TeamsUsers;
 use App\Models\User;
@@ -20,9 +21,20 @@ trait UserTeampermTrait
         return $role->$permisionKey;
     }
 
+    public function projects()
+    {
+        $teamsIds = $this->teams->pluck('id')->toArray();
+
+        $list  = Project::whereIn('team_id', $teamsIds)->orWhere('user_id', $this->id)->get();
+
+        return $list;
+
+
+    }
+
     public function teams()
     {
-        return $this->belongsToMany(Team::class, "teams_users", "user_id", "team_id")->using(TeamsUsers::class)->withPivot(["memberType",'is_invite','id']);
+        return $this->belongsToMany(Team::class, "teams_users", "user_id", "team_id")->using(TeamsUsers::class)->withPivot(["memberType", 'is_invite', 'id']);
     }
 
 

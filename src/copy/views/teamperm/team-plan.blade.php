@@ -7,8 +7,9 @@
 
 
 @php
+    $tarifLimits = \App\Library\Teamperm\TeampermPort::GetUserLimits($item->owner());
     $members = $item->users->count();
-    $maxMembers = 5;
+    $maxMembers = $tarifLimits['teamMembers'];
     $percent =round($members/$maxMembers*100);
 @endphp
 

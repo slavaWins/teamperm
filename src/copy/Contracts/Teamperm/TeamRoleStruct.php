@@ -11,7 +11,8 @@ class TeamRoleStruct extends TeamRoleBaseStruct
 {
 
 
-    public bool $canEdit = false;
-    public bool $canView = false;
+
+    public bool $canCustomMake1 = false;
+    public bool $canCustomMake2 = false;
 
 }

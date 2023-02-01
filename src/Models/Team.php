@@ -3,6 +3,7 @@
 
 namespace Teamperm\Models;
 
+use App\Models\Project;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -33,7 +34,7 @@ class Team extends MPModel
 
         $config->String("name")->SetLabel("Название команды")->SetMin(3)->SetMax(17)->AddTag(['profile', 'admin']);
 
-       // $config->Int("owner_id")->SetLabel("Владелец")->AddTag(['profile', 'admin'])->SetBelong(User::class, 'owner', 'name');
+        // $config->Int("owner_id")->SetLabel("Владелец")->AddTag(['profile', 'admin'])->SetBelong(User::class, 'owner', 'name');
 
 
         $config->Select("projectType")->SetLabel("Тип проекта")->SetDescr("Для чего будет использоваться проект.")->SetOptions([
@@ -57,8 +58,15 @@ class Team extends MPModel
         return null;
     }
 
+    public function projects()
+    {
+        $list = Project::where('team_id', $this->id)->get();
+
+        return $list;
+    }
+
     public function users()
     {
-        return $this->belongsToMany(User::class, "teams_users", "team_id", "user_id")->using(TeamsUsers::class)->withPivot(["memberType", 'is_invite','id']);
+        return $this->belongsToMany(User::class, "teams_users", "team_id", "user_id")->using(TeamsUsers::class)->withPivot(["memberType", 'is_invite', 'id']);
     }
 }

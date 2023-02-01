@@ -73,7 +73,7 @@
         </table>
         @if($user->CheckTeamPermission($item, "canSendInvitations"))
             <div class="card-body pt-0">
-                <x-mrp-form route="{{route('team.member.add', $item)}}" btn="Добавить">
+                <x-easy-form route="{{route('team.member.add', $item)}}" btn="Добавить">
 
 
                     <div class="col py-3">
@@ -98,7 +98,7 @@
                          ->RenderHtml(true);
                     @endphp
 
-                </x-mrp-form>
+                </x-easy-form>
 
             </div>
 

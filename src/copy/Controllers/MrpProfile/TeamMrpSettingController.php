@@ -20,27 +20,16 @@ class TeamMrpSettingController extends Controller
 {
 
 
-    public function profile(Project $project, Request $request)
+    public function profile(Team $team, Request $request)
     {
-        $result = $project->ValidateAndFilibleByRequest($request->toArray(), "profile");
-        if ($result === true) {
-            return ResponseApi::Successful();
-        }
-        return ResponseApi::Error($result);
-    }
 
-    public function design(Project $project, Request $request)
-    {
-        $result = $project->ValidateAndFilibleByRequest($request->toArray(), "project.setting.design");
-        if ($result === true) {
-            return ResponseApi::Successful();
+        /** @var User $user */
+        $user = Auth::user();
+        if(!$user->CheckTeamPermission($team, "edit")){
+            return abort(404);
         }
-        return ResponseApi::Error($result);
-    }
 
-    public function network(Project $project, Request $request)
-    {
-        $result = $project->ValidateAndFilibleByRequest($request->toArray(), "project.setting.network");
+        $result = $team->ValidateAndFilibleByRequest($request->toArray(), "profile");
         if ($result === true) {
             return ResponseApi::Successful();
         }
@@ -50,6 +39,12 @@ class TeamMrpSettingController extends Controller
 
     public function index(Team $team)
     {
+        /** @var User $user */
+        $user = Auth::user();
+        if(!$user->CheckTeamPermission($team, "view")){
+            return abort(404);
+        }
+
         $item = $team;
 
         $page = PageBuilder::New($item);
@@ -58,7 +53,7 @@ class TeamMrpSettingController extends Controller
 
 
         $page->AddRow("Проекты");
-        $page->AddTab("Проекты")->view = "teamperm.members";
+        $page->AddTab("Проекты")->view = "teamperm.projects";
 
 
         $page->AddRow("Участники");
